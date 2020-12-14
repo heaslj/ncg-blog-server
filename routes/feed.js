@@ -6,10 +6,23 @@ const isAuth = require('../middleware/is-auth');
 
 const router = express.Router();
 
-// GET /feed/posts
+// GET /feed
+//          /posts
 router.get('/posts', isAuth, feedController.getPosts);
 
-// POST /feed/post
+//          /status
+router.get('/status', isAuth, feedController.getStatus);
+
+// POST /feed
+//          /updateStatus
+router.post('/updateStatus', isAuth, [
+  body('status')
+  .trim()
+  .not().isEmpty()
+  ],
+feedController.updateStatus);
+
+//          /post
 router.post(
   '/post',
   isAuth,

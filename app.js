@@ -15,7 +15,7 @@ const fileStorage = multer.diskStorage({
     cb(null, 'images');
   },
   filename: (req, file, cb) => {
-    cb(null, new Date().toISOString() + '-' + file.originalname);
+    cb(null, Date.now() + '-' + file.originalname);
   }
 });
 
@@ -61,7 +61,7 @@ app.use((error, req, res, next) => {
 
 mongoose
   .connect(
-    'mongodb+srv://maximilian:9u4biljMQc4jjqbe@cluster0-ntrwp.mongodb.net/messages?retryWrites=true'
+    'mongodb+srv://node-user:<PASSWORD>@completenodejs-cluster0.wdl2t.mongodb.net/blog?w=majority'
   )
   .then(result => {
     app.listen(8080);
