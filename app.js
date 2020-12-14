@@ -61,7 +61,7 @@ app.use((error, req, res, next) => {
 
 mongoose
   .connect(
-    'mongodb+srv://node-user:E13bQf5kzOhUxLu5@completenodejs-cluster0.wdl2t.mongodb.net/blog?w=majority'
+    'mongodb+srv://node-user:<PASSWORD>@completenodejs-cluster0.wdl2t.mongodb.net/blog?w=majority'
   )
   .then(result => {
     app.listen(8080);
