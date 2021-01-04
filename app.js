@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -55,6 +56,21 @@ app.use((req, res, next) => {
 
 app.use(auth);
 
+app.put('/post-image', (req, res, next) => {
+  if (!req.isAuth) {
+    const error = new Error('Not authenticated!');
+    error.code = 401;
+    throw error;
+  }
+  if (!req.file) {
+    return res.status(200).json( { message: 'No file provided.'});
+  }
+  if (req.body.oldPath) {
+    clearImage(req.body.oldPath);
+  }
+  return res.status(201).json( { message: 'File successfully uploaded', filePath: req.file.path.replace("\\", "/")});
+});
+
 app.use(
   '/graphql',
   graphqlHttp({
@@ -83,9 +99,15 @@ app.use((error, req, res, next) => {
 
 mongoose
   .connect(
-    'mongodb+srv://node-user:<PASSWORD>@completenodejs-cluster0.wdl2t.mongodb.net/blog?w=majority'
+    'mongodb+srv://node-user:<PASSWORD>@completenodejs-cluster0.wdl2t.mongodb.net/blog?w=majority', { useNewUrlParser: true, useUnifiedTopology: true }
   )
   .then(result => {
     app.listen(8080);
   })
   .catch(err => console.log(err));
+
+  const clearImage = filePath => {
+    filePath = path.join(__dirname, '..', filePath);
+    fs.unlink(filePath, err => console.log(err));
+  };
+  
