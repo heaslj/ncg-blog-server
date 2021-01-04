@@ -1,5 +1,4 @@
 const path = require('path');
-const fs = require('fs');
 
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -10,6 +9,7 @@ const graphqlHttp = require('express-graphql');
 const graphqlSchema = require('./graphql/schema');
 const graphqlResolver = require('./graphql/resolvers');
 const auth = require('./middleware/auth');
+const { clearImage } = require('./util/file');
 
 const app = express();
 
@@ -18,7 +18,7 @@ const fileStorage = multer.diskStorage({
     cb(null, 'images');
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + '-' + file.originalname);
+    cb(null, new Date().toISOString() + '-' + file.originalname);
   }
 });
 
@@ -58,17 +58,17 @@ app.use(auth);
 
 app.put('/post-image', (req, res, next) => {
   if (!req.isAuth) {
-    const error = new Error('Not authenticated!');
-    error.code = 401;
-    throw error;
+    throw new Error('Not authenticated!');
   }
   if (!req.file) {
-    return res.status(200).json( { message: 'No file provided.'});
+    return res.status(200).json({ message: 'No file provided!' });
   }
   if (req.body.oldPath) {
     clearImage(req.body.oldPath);
   }
-  return res.status(201).json( { message: 'File successfully uploaded', filePath: req.file.path.replace("\\", "/")});
+  return res
+    .status(201)
+    .json({ message: 'File stored.', filePath: req.file.path });
 });
 
 app.use(
@@ -106,8 +106,4 @@ mongoose
   })
   .catch(err => console.log(err));
 
-  const clearImage = filePath => {
-    filePath = path.join(__dirname, '..', filePath);
-    fs.unlink(filePath, err => console.log(err));
-  };
-  
+
